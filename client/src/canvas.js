@@ -1,14 +1,25 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { socket } from "./start";
+import { useHistory } from "react-router-dom";
+import Timer from "./startTimer";
+import Guessing from "./guessing";
 
 export default function Canvas() {
+    const history = useHistory();
     const canvasRef = useRef(null);
     const [isPainting, setIsPainting] = useState(false);
     const [mousePosition, setMousePosition] = useState(null);
     const [isDrawer, setIsDrawer] = useState(false);
     const [loggedUser, setLoggedUser] = useState();
+    const [randomWord, setRandomWord] = useState("");
 
     useEffect(() => {
+        // get random word from server
+        socket.emit("getRandomWord");
+        socket.on("generateRandomWord", (data) => {
+            console.log("randomWord", data);
+            setRandomWord(data);
+        });
         // get the loggedUser
         getLoggedInUser();
         socket.on("drawing", (data) =>
@@ -18,9 +29,20 @@ export default function Canvas() {
         socket.emit("setDrawer");
         // on answer to the "setDrawer"-emit I will set the drawer
         socket.on("isDrawer", (data) => {
-            console.log("drawer data", data);
             setIsDrawer(data);
         });
+        // listen to the timer being done
+        socket.on("timerIsDone", () => {
+            //history.push("/points");
+        });
+        // clean up
+        return () => {
+            socket.removeListener("timerIsDone");
+            socket.removeListener("drawing");
+            socket.removeListener("isDrawer");
+            socket.removeListener("setDrawer");
+            socket.removeListener("generateRandomWord");
+        };
     }, []);
 
     function getLoggedInUser() {
@@ -29,7 +51,6 @@ export default function Canvas() {
         socket.emit("getLoggedInUser");
         // once I get my logged in user back I store him as loggedUser
         socket.on("loggedInUser", (data) => {
-            console.log(data);
             setLoggedUser(data);
         });
     }
@@ -91,47 +112,46 @@ export default function Canvas() {
         }
     };
 
-    function RenderCanvas() {
-        if (loggedUser) {
-            if (loggedUser.id === isDrawer.id) {
-                return (
-                    <div>
-                        <h1>isDrawer: {`${loggedUser.username}`}</h1>
-                        <canvas
-                            ref={canvasRef}
-                            height={canvasHeightDrawer}
-                            width={canvasWidth}
-                            onMouseDown={startPaint}
-                            onMouseMove={paint}
-                            onMouseUp={exitPaint}
-                            onMouseLeave={exitPaint}
-                            onTouchStart={startPaint}
-                            onTouchMove={paint}
-                            onTouchEnd={exitPaint}
-                        />
-                    </div>
-                );
-            } else {
-                return (
-                    <div>
-                        <canvas
-                            className="guesser-canvas"
-                            ref={canvasRef}
-                            height={canvasHeightGuesser}
-                            width={canvasWidth}
-                        />
-                    </div>
-                );
-            }
-        } else {
-            return <></>;
-        }
-    }
-
     const canvasWidth = window.innerWidth;
-
     const canvasHeightDrawer = window.innerHeight - 200;
     const canvasHeightGuesser = window.innerHeight / 2;
 
-    return <RenderCanvas />;
+    if (!loggedUser) {
+        return null;
+    }
+
+    if (loggedUser.id === isDrawer.id) {
+        return (
+            <div>
+                <Timer seconds={30} />
+                <h1>isDrawer: {`${loggedUser.username}`}</h1>
+                <p>Please draw: {randomWord}</p>
+                <canvas
+                    ref={canvasRef}
+                    height={canvasHeightDrawer}
+                    width={canvasWidth}
+                    onMouseDown={startPaint}
+                    onMouseMove={paint}
+                    onMouseUp={exitPaint}
+                    onMouseLeave={exitPaint}
+                    onTouchStart={startPaint}
+                    onTouchMove={paint}
+                    onTouchEnd={exitPaint}
+                />
+            </div>
+        );
+    } else {
+        return (
+            <div>
+                <h1>{isDrawer.username} is drawing...</h1>
+                <canvas
+                    className="guesser-canvas"
+                    ref={canvasRef}
+                    height={canvasHeightGuesser}
+                    width={canvasWidth}
+                />
+                <Guessing randomWord={randomWord} />
+            </div>
+        );
+    }
 }

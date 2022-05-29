@@ -28,11 +28,20 @@ server.listen(process.env.PORT || 3001, function () {
 
 let drawer = null;
 let users = [];
+const word = ["cat", "tree", "banana", "baby", "eye", "king"];
 
 io.on("connection", (socket) => {
     console.log("connect: ", socket.id);
+    // emit random word to all players
+    socket.on("getRandomWord", () => {
+        io.emit(
+            "generateRandomWord",
+            word[Math.floor(Math.random() * word.length)]
+        );
+    });
 
     socket.on("setDrawer", () => {
+        /* 
         // get all the users that have not drawn
         const notDrawnUsers = users.filter((user) => {
             if (!user.hasDrawn) {
@@ -48,7 +57,9 @@ io.on("connection", (socket) => {
             if (drawer.id === users[i].id) {
                 users[i].hasDrawn = true;
             }
-        }
+        } */
+
+        drawer = users[Math.floor(Math.random() * users.length)];
         console.log("users after randomly selected drawrer", users);
         // let everyone know who the drawer is
         io.emit("isDrawer", drawer);
@@ -65,6 +76,7 @@ io.on("connection", (socket) => {
             ready: false,
             id: socket.id,
             username: data,
+            points: 0,
         };
         // add that user to the users array
         users.push(newUser);
@@ -109,6 +121,15 @@ io.on("connection", (socket) => {
 
     socket.on("timerDone", () => {
         io.emit("timerIsDone");
+    });
+
+    socket.on("storePoints", (data) => {
+        for (let i = 0; i < users.length; i++) {
+            if (users[i].id === socket.id) {
+                users[i].points = users[i].points + data;
+            }
+        }
+        console.log("users after points", users);
     });
 
     socket.on("disconnect", async () => {

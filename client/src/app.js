@@ -1,30 +1,27 @@
 import Canvas from "./canvas";
 import Login from "./login";
 import Room from "./room";
-import { useState } from "react";
+import Points from "./points";
 
 //import { socket } from "./start";
 import { BrowserRouter, Route } from "react-router-dom";
 
 export default function App() {
-    const [user, setUser] = useState();
-
-    function getLoggedUser(data) {
-        console.log(data);
-    }
-
     return (
         <BrowserRouter>
             <Route exact path="/">
                 <Login />
             </Route>
             <Route exact path="/room">
-                <Room getLoggedUser={getLoggedUser} />
+                <Room />
             </Route>
             <Route exact path="/play">
                 <div className="wrapper">
                     <Canvas />
                 </div>
+            </Route>
+            <Route exact path="/points">
+                <Points />
             </Route>
         </BrowserRouter>
     );

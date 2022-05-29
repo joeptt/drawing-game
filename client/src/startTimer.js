@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { socket } from "./start";
 
-export default function Timer() {
-    const [timeLeft, setTimeLeft] = useState(3);
+export default function Timer({ seconds }) {
+    const [timeLeft, setTimeLeft] = useState(seconds);
     useEffect(() => {
-        startTimer(3);
+        startTimer(seconds);
     }, []);
 
     // timer function

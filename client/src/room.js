@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { socket } from "./start";
-import { Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 import Timer from "./startTimer";
 
-export default function Room({ getLoggedUser }) {
+export default function Room() {
+    const history = useHistory();
     const [users, setUsers] = useState([]);
     const [showTimer, setShowTimer] = useState(false);
 
@@ -35,18 +36,16 @@ export default function Room({ getLoggedUser }) {
         socket.on("timerIsDone", () => {
             console.log("Hello");
             setShowTimer(false);
-            history.pushState({}, null, "/play");
+            //history.pushState({}, null, "/play");
+            history.push("/play");
         });
     }
 
     return (
         <div>
-            {showTimer && <Timer />}
+            {showTimer && <Timer seconds={3} />}
 
             <button onClick={onClickReady}>READY</button>
-            <Link to="/play">
-                <button>Start</button>
-            </Link>
             <p>Users:</p>
             {users &&
                 users.map((user) => {
