@@ -33,8 +33,10 @@ io.on("connection", (socket) => {
     console.log("connect: ", socket.id);
 
     socket.on("setDrawer", () => {
+        // randomly select one of the users
         drawer = users[Math.floor(Math.random() * users.length)];
         console.log("isDrawer", drawer);
+        // let everyone know who the drawer is
         io.emit("isDrawer", drawer);
     });
 
@@ -43,19 +45,22 @@ io.on("connection", (socket) => {
     });
 
     socket.on("login", (data) => {
-        console.log("login ON");
+        // create a new user
         const newUser = {
             ready: false,
+            id: socket.id,
+            username: data,
         };
-        newUser.id = socket.id;
-        newUser.username = data;
+        // add that user to the users array
         users.push(newUser);
         console.log(users);
+        // send the currently logged in users to the clients
         io.emit("users", users);
     });
 
     socket.on("getLoggedInUsers", () => {
         console.log("users", users);
+        // send the current users array to client to display once they enter the "room-page"
         socket.emit("responseLoggedUsers", users);
     });
 
@@ -77,6 +82,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("getLoggedInUser", () => {
+        // get the user logged in on device
         for (let i = 0; i < users.length; i++) {
             if (users[i].id === socket.id) {
                 socket.emit("loggedInUser", {
@@ -92,7 +98,7 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", async () => {
         console.log("disconnect", socket.id);
-        // delete user from users arr if the disconnect
+        // delete user from users array on disconnect
         for (let i = 0; i < users.length; i++) {
             if (users[i].id === socket.id) {
                 users.splice(i, 1);

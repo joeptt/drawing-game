@@ -9,11 +9,14 @@ export default function Canvas() {
     const [loggedUser, setLoggedUser] = useState();
 
     useEffect(() => {
+        // get the loggedUser
         getLoggedInUser();
         socket.on("drawing", (data) =>
             drawLine(data.mousePosition, data.newMousePosition)
         );
+        // send request to server to send back the randomly selected drawer
         socket.emit("setDrawer");
+        // on answer to the "setDrawer"-emit I will set the drawer
         socket.on("isDrawer", (data) => {
             console.log("drawer data", data);
             setIsDrawer(data);
@@ -21,7 +24,10 @@ export default function Canvas() {
     }, []);
 
     function getLoggedInUser() {
+        // sends an emit to the server where I will compare the socket.id to all user.id's \
+        // to find out which is the currently logged on user on this device
         socket.emit("getLoggedInUser");
+        // once I get my logged in user back I store him as loggedUser
         socket.on("loggedInUser", (data) => {
             console.log(data);
             setLoggedUser(data);

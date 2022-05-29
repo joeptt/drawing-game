@@ -9,13 +9,13 @@ export default function Room({ getLoggedUser }) {
     const [showTimer, setShowTimer] = useState(false);
 
     useEffect(() => {
-        getLoggedInUser();
+        // get all logged in users when you enter the room-page
         socket.emit("getLoggedInUsers");
         socket.on("responseLoggedUsers", (data) => {
             console.log(data);
             setUsers(data);
         });
-
+        // listen to new users joining the room once you have joined already & if the users changed their ready property to true
         socket.on("users", (data) => {
             console.log("All users", users);
             console.log("users ON");
@@ -24,18 +24,14 @@ export default function Room({ getLoggedUser }) {
         });
     }, []);
 
-    function getLoggedInUser() {
-        socket.emit("getLoggedInUser");
-        socket.on("loggedInUser", (data) => {
-            console.log("logged in user", data);
-        });
-    }
-
     function onClickReady() {
+        // tell server that user has clicked the ready button, server side check which user it was and emit the updated array
         socket.emit("readyClicked");
+        // when all users have their ready property set to true start the timer
         socket.on("startTimer", () => {
             setShowTimer(true);
         });
+        // listen to when the timer is done and hide the timer again
         socket.on("timerIsDone", () => {
             console.log("Hello");
             setShowTimer(false);

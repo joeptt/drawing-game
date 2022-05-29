@@ -2,11 +2,10 @@
 import { socket } from "./start";
 import { Link } from "react-router-dom";
 
-export default function Login({ getLoggedUser }) {
+export default function Login() {
     //const [error, setError] = useState("");
 
     function onSubmit(event) {
-        console.log("onSubmit");
         event.preventDefault();
         const username = event.target.username.value;
         socket.emit("login", username);
