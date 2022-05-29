@@ -33,9 +33,23 @@ io.on("connection", (socket) => {
     console.log("connect: ", socket.id);
 
     socket.on("setDrawer", () => {
+        // get all the users that have not drawn
+        const notDrawnUsers = users.filter((user) => {
+            if (!user.hasDrawn) {
+                return user;
+            }
+        });
+        console.log("users not drawn", notDrawnUsers);
         // randomly select one of the users
-        drawer = users[Math.floor(Math.random() * users.length)];
+        drawer = notDrawnUsers[Math.floor(Math.random() * users.length)];
         console.log("isDrawer", drawer);
+        // set drawers "hasDrawn" property to true
+        for (let i = 0; i < users.length; i++) {
+            if (drawer.id === users[i].id) {
+                users[i].hasDrawn = true;
+            }
+        }
+        console.log("users after randomly selected drawrer", users);
         // let everyone know who the drawer is
         io.emit("isDrawer", drawer);
     });
@@ -47,6 +61,7 @@ io.on("connection", (socket) => {
     socket.on("login", (data) => {
         // create a new user
         const newUser = {
+            hasDrawn: false,
             ready: false,
             id: socket.id,
             username: data,
