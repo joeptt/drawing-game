@@ -6,16 +6,27 @@ export default function Canvas() {
     const [isPainting, setIsPainting] = useState(false);
     const [mousePosition, setMousePosition] = useState(null);
     const [isDrawer, setIsDrawer] = useState(false);
+    const [loggedUser, setLoggedUser] = useState();
 
     useEffect(() => {
+        getLoggedInUser();
         socket.on("drawing", (data) =>
             drawLine(data.mousePosition, data.newMousePosition)
         );
+        socket.emit("setDrawer");
         socket.on("isDrawer", (data) => {
             console.log("drawer data", data);
             setIsDrawer(data);
         });
     }, []);
+
+    function getLoggedInUser() {
+        socket.emit("getLoggedInUser");
+        socket.on("loggedInUser", (data) => {
+            console.log(data);
+            setLoggedUser(data);
+        });
+    }
 
     const startPaint = useCallback((event) => {
         const coordinates = getCoordinates(event);
@@ -74,18 +85,12 @@ export default function Canvas() {
         }
     };
 
-    const canvasWidth = window.innerWidth;
-
-    const canvasHeightDrawer = window.innerHeight - 200;
-    const canvasHeightGuesser = window.innerHeight - window.innerHeight / 2;
-
-    return (
-        <>
-            <div>
-                <h1>HELLO</h1>
-                {isDrawer && (
+    function RenderCanvas() {
+        if (loggedUser) {
+            if (loggedUser.id === isDrawer.id) {
+                return (
                     <div>
-                        <h1>isDrawer: {`${isDrawer}`}</h1>
+                        <h1>isDrawer: {`${loggedUser.username}`}</h1>
                         <canvas
                             ref={canvasRef}
                             height={canvasHeightDrawer}
@@ -99,8 +104,9 @@ export default function Canvas() {
                             onTouchEnd={exitPaint}
                         />
                     </div>
-                )}
-                {!isDrawer && (
+                );
+            } else {
+                return (
                     <div>
                         <canvas
                             className="guesser-canvas"
@@ -109,9 +115,17 @@ export default function Canvas() {
                             width={canvasWidth}
                         />
                     </div>
-                )}
-                ;
-            </div>
-        </>
-    );
+                );
+            }
+        } else {
+            return <></>;
+        }
+    }
+
+    const canvasWidth = window.innerWidth;
+
+    const canvasHeightDrawer = window.innerHeight - 200;
+    const canvasHeightGuesser = window.innerHeight / 2;
+
+    return <RenderCanvas />;
 }

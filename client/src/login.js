@@ -1,8 +1,8 @@
-import { useState } from "react";
+//import { useState } from "react";
 import { socket } from "./start";
 import { Link } from "react-router-dom";
 
-export default function Login() {
+export default function Login({ getLoggedUser }) {
     //const [error, setError] = useState("");
 
     function onSubmit(event) {
