@@ -41,25 +41,36 @@ io.on("connection", (socket) => {
     });
 
     socket.on("setDrawer", () => {
-        /* 
         // get all the users that have not drawn
-        const notDrawnUsers = users.filter((user) => {
+        let notDrawnUsers = users.filter((user) => {
             if (!user.hasDrawn) {
                 return user;
             }
         });
         console.log("users not drawn", notDrawnUsers);
-        // randomly select one of the users
-        drawer = notDrawnUsers[Math.floor(Math.random() * users.length)];
-        console.log("isDrawer", drawer);
         // set drawers "hasDrawn" property to true
+        if (notDrawnUsers.length === 0) {
+            for (let i = 0; i < users.length; i++) {
+                users[i].hasDrawn = false;
+            }
+            notDrawnUsers = users.filter((user) => {
+                if (!user.hasDrawn) {
+                    return user;
+                }
+            });
+        }
+        // randomly select one of the users
+        drawer =
+            notDrawnUsers[Math.floor(Math.random() * notDrawnUsers.length)];
+        console.log("isDrawer", drawer);
+
         for (let i = 0; i < users.length; i++) {
             if (drawer.id === users[i].id) {
                 users[i].hasDrawn = true;
             }
-        } */
+        }
 
-        drawer = users[Math.floor(Math.random() * users.length)];
+        //drawer = users[Math.floor(Math.random() * users.length)];
         console.log("users after randomly selected drawrer", users);
         // let everyone know who the drawer is
         io.emit("isDrawer", drawer);
@@ -119,8 +130,8 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on("timerDone", () => {
-        io.emit("timerIsDone");
+    socket.on("timerDone", (route) => {
+        io.emit("timerIsDone", route);
     });
 
     socket.on("storePoints", (data) => {
@@ -130,6 +141,7 @@ io.on("connection", (socket) => {
             }
         }
         console.log("users after points", users);
+        io.emit("usersWithPoints", users);
     });
 
     socket.on("disconnect", async () => {

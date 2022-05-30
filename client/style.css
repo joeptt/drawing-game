@@ -2,3 +2,120 @@
     margin: 0;
     box-sizing: border-box;
 }
+/* LOGIN */
+
+.login-div {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+}
+
+.login-form input {
+    height: 100px;
+    width: 90%;
+    margin-bottom: 60px;
+    text-align: center;
+    font-size: 30px;
+    border: none;
+    background-color: #efefef;
+    border-radius: 5px;
+}
+
+.login-form button {
+    font-size: 40px;
+    height: 100px;
+    width: 40%;
+    border: none;
+    background-color: greenyellow;
+    border-radius: 5px;
+}
+
+/* ROOM  */
+
+.div-room {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+}
+
+.div-room button {
+    position: absolute;
+    bottom: 80px;
+    font-size: 40px;
+    height: 100px;
+    width: 40%;
+    border: none;
+    background-color: greenyellow;
+    border-radius: 15px;
+}
+
+.users-room {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin-bottom: 100px;
+}
+
+.users-room p {
+    font-size: 30px;
+}
+
+.headline-room {
+    font-size: 100px;
+    margin-bottom: 50px;
+    margin-top: 50px;
+}
+
+.countdown-room {
+    z-index: 1;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 300px;
+}
+
+/* GUESSER */
+
+.keyboard-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.keyboard-row-2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.keyboard-key {
+    font-size: 100px;
+}
+
+.keyboard {
+    z-index: 10;
+    position: absolute;
+    bottom: 0px;
+    height: 40%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+}

@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { socket } from "./start";
 
-export default function Timer({ seconds }) {
+export default function Timer({ seconds, route }) {
     const [timeLeft, setTimeLeft] = useState(seconds);
     useEffect(() => {
-        startTimer(seconds);
+        // to prevent memory spilling I have to clear the timeout
+        let id = startTimer(seconds);
+        return () => clearTimeout(id);
     }, []);
 
     // timer function
@@ -12,14 +14,15 @@ export default function Timer({ seconds }) {
         let seconds = x;
         if (seconds <= 0) {
             // send the server a message when the timer is done so I can continue to the drawing page
-            socket.emit("timerDone");
+            socket.emit("timerDone", route);
             return;
         }
-        setTimeout(() => {
+        let id = setTimeout(() => {
             seconds--;
             setTimeLeft(seconds);
             startTimer(seconds);
         }, 1000);
+        return id;
     }
 
     return (

@@ -33,28 +33,32 @@ export default function Room() {
             setShowTimer(true);
         });
         // listen to when the timer is done and hide the timer again
-        socket.on("timerIsDone", () => {
+        socket.on("timerIsDone", (route) => {
             console.log("Hello");
             setShowTimer(false);
             //history.pushState({}, null, "/play");
-            history.push("/play");
+            history.push(route);
         });
     }
 
     return (
-        <div>
-            {showTimer && <Timer seconds={3} />}
+        <div className="div-room">
+            <div className="countdown-room">
+                {showTimer && <Timer seconds={3} route="/play" />}
+            </div>
 
+            <h1 className="headline-room">Users:</h1>
+            <div className="users-room">
+                {users &&
+                    users.map((user) => {
+                        return (
+                            <p key={user.id}>
+                                {user.username} is {user.ready || "not"} ready.
+                            </p>
+                        );
+                    })}
+            </div>
             <button onClick={onClickReady}>READY</button>
-            <p>Users:</p>
-            {users &&
-                users.map((user) => {
-                    return (
-                        <p key={user.id}>
-                            {user.username} is {user.ready || "not"} ready.
-                        </p>
-                    );
-                })}
         </div>
     );
 }

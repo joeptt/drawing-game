@@ -19,9 +19,8 @@ export default function Login() {
     }
 
     return (
-        <div>
-            <h1>Drawing Game!!!</h1>
-            <form onSubmit={onSubmit}>
+        <div className="login-div">
+            <form className="login-form" onSubmit={onSubmit}>
                 <input name="username" placeholder="Enter Name..."></input>
                 <button>Play</button>
             </form>

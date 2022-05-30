@@ -12,6 +12,8 @@ export default function Canvas() {
     const [isDrawer, setIsDrawer] = useState(false);
     const [loggedUser, setLoggedUser] = useState();
     const [randomWord, setRandomWord] = useState("");
+    const canvasWidth = window.innerWidth;
+    const canvasHeight = window.innerHeight;
 
     useEffect(() => {
         // get random word from server
@@ -20,8 +22,14 @@ export default function Canvas() {
             console.log("randomWord", data);
             setRandomWord(data);
         });
-        // get the loggedUser
-        getLoggedInUser();
+        // sends an emit to the server where I will compare the socket.id to all user.id's \
+        // to find out which is the currently logged on user on this device
+        socket.emit("getLoggedInUser");
+        // once I get my logged in user back I store him as loggedUser
+        socket.on("loggedInUser", (data) => {
+            setLoggedUser(data);
+        });
+
         socket.on("drawing", (data) =>
             drawLine(data.mousePosition, data.newMousePosition)
         );
@@ -32,28 +40,18 @@ export default function Canvas() {
             setIsDrawer(data);
         });
         // listen to the timer being done
-        socket.on("timerIsDone", () => {
-            //history.push("/points");
+        socket.on("timerIsDone", (route) => {
+            history.push(route);
         });
         // clean up
         return () => {
             socket.removeListener("timerIsDone");
             socket.removeListener("drawing");
             socket.removeListener("isDrawer");
-            socket.removeListener("setDrawer");
             socket.removeListener("generateRandomWord");
+            socket.removeListener("loggedInUser");
         };
-    }, []);
-
-    function getLoggedInUser() {
-        // sends an emit to the server where I will compare the socket.id to all user.id's \
-        // to find out which is the currently logged on user on this device
-        socket.emit("getLoggedInUser");
-        // once I get my logged in user back I store him as loggedUser
-        socket.on("loggedInUser", (data) => {
-            setLoggedUser(data);
-        });
-    }
+    }, [canvasWidth, canvasHeight]);
 
     const startPaint = useCallback((event) => {
         const coordinates = getCoordinates(event);
@@ -83,14 +81,15 @@ export default function Canvas() {
     }, []);
 
     const getCoordinates = (event) => {
+        console.log("eventtouches", event);
         if (!canvasRef.current) return;
 
         const canvas = canvasRef.current;
         const x = event.pageX || event.touches[0].clientX;
         const y = event.pageY || event.touches[0].clientY;
         return {
-            x: x - canvas.offsetLeft,
-            y: y - canvas.offsetTop,
+            x: x / canvasWidth,
+            y: (y - canvas.offsetTop) / canvasHeight,
         };
     };
 
@@ -105,16 +104,18 @@ export default function Canvas() {
             context.lineWidth = 10;
 
             context.beginPath();
-            context.moveTo(originalMousePosition.x, originalMousePosition.y);
-            context.lineTo(newMousePosition.x, newMousePosition.y);
+            context.moveTo(
+                originalMousePosition.x * canvasWidth,
+                originalMousePosition.y * canvasHeight
+            );
+            context.lineTo(
+                newMousePosition.x * canvasWidth,
+                newMousePosition.y * canvasHeight
+            );
             context.closePath();
             context.stroke();
         }
     };
-
-    const canvasWidth = window.innerWidth;
-    const canvasHeightDrawer = window.innerHeight - 200;
-    const canvasHeightGuesser = window.innerHeight / 2;
 
     if (!loggedUser) {
         return null;
@@ -123,12 +124,12 @@ export default function Canvas() {
     if (loggedUser.id === isDrawer.id) {
         return (
             <div>
-                <Timer seconds={30} />
+                <Timer seconds={3000} route="/points" />
                 <h1>isDrawer: {`${loggedUser.username}`}</h1>
                 <p>Please draw: {randomWord}</p>
                 <canvas
                     ref={canvasRef}
-                    height={canvasHeightDrawer}
+                    height={canvasHeight}
                     width={canvasWidth}
                     onMouseDown={startPaint}
                     onMouseMove={paint}
@@ -147,7 +148,7 @@ export default function Canvas() {
                 <canvas
                     className="guesser-canvas"
                     ref={canvasRef}
-                    height={canvasHeightGuesser}
+                    height={canvasHeight}
                     width={canvasWidth}
                 />
                 <Guessing randomWord={randomWord} />
