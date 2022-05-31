@@ -1,6 +1,9 @@
 * {
     margin: 0;
     box-sizing: border-box;
+}
+
+main {
     overscroll-behavior: contain;
 }
 
