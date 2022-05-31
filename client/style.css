@@ -3,8 +3,11 @@
     box-sizing: border-box;
 }
 
-main {
-    overscroll-behavior: contain;
+html,
+body,
+main,
+.wrapper {
+    height: 100%;
 }
 
 /* LOGIN */
