@@ -10,6 +10,10 @@ main,
     height: 100%;
 }
 
+body {
+    overscroll-behavior: contain;
+}
+
 /* LOGIN */
 
 .login-div {
