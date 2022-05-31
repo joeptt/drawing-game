@@ -2,6 +2,10 @@
     margin: 0;
     box-sizing: border-box;
 }
+
+body {
+    overscroll-behavior: contain;
+}
 /* LOGIN */
 
 .login-div {
