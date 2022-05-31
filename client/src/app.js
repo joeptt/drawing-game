@@ -9,6 +9,8 @@ import { BrowserRouter, Route } from "react-router-dom";
 
 export default function App() {
     const [users, setUsers] = useState();
+    const [color, setColor] = useState("black");
+    const [pencilWidth, setPencilWidth] = useState(10);
 
     useEffect(() => {
         socket.on("usersWithPoints", (data) => {
@@ -16,6 +18,17 @@ export default function App() {
             setUsers(data);
         });
     }, []);
+
+    function onSlide(event) {
+        const width = event.target.value;
+        setPencilWidth(width);
+    }
+
+    function onClickColor(event) {
+        const newColor = event.target.id;
+        console.log("color:", newColor);
+        setColor(newColor);
+    }
 
     return (
         <BrowserRouter>
@@ -27,7 +40,12 @@ export default function App() {
             </Route>
             <Route exact path="/play">
                 <div className="wrapper">
-                    <Canvas />
+                    <Canvas
+                        onClickColor={onClickColor}
+                        color={color}
+                        onSlide={onSlide}
+                        pencilWidth={pencilWidth}
+                    />
                 </div>
             </Route>
             <Route exact path="/points">

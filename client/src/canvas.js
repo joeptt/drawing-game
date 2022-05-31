@@ -3,8 +3,9 @@ import { socket } from "./start";
 import { useHistory } from "react-router-dom";
 import Timer from "./startTimer";
 import Guessing from "./guessing";
+import Colortools from "./colortools";
 
-export default function Canvas() {
+export default function Canvas({ color, onClickColor, pencilWidth, onSlide }) {
     const history = useHistory();
     const canvasRef = useRef(null);
     const [isPainting, setIsPainting] = useState(false);
@@ -13,6 +14,7 @@ export default function Canvas() {
     const [loggedUser, setLoggedUser] = useState();
     const [randomWord, setRandomWord] = useState("");
     const [wrongGuess, setWrongGuess] = useState("");
+
     const canvasWidth = window.innerWidth;
     const canvasHeight = window.innerHeight;
 
@@ -31,9 +33,15 @@ export default function Canvas() {
             setLoggedUser(data);
         });
 
-        socket.on("drawing", (data) =>
-            drawLine(data.mousePosition, data.newMousePosition)
-        );
+        socket.on("drawing", (data) => {
+            console.log(data.color);
+            drawLine(
+                data.mousePosition,
+                data.newMousePosition,
+                data.color,
+                data.pencilWidth
+            );
+        });
         // send request to server to send back the randomly selected drawer
         socket.emit("setDrawer");
         // on answer to the "setDrawer"-emit I will set the drawer
@@ -75,9 +83,19 @@ export default function Canvas() {
             if (isPainting && isDrawer) {
                 const newMousePosition = getCoordinates(event);
                 if (mousePosition && newMousePosition) {
-                    drawLine(mousePosition, newMousePosition);
+                    drawLine(
+                        mousePosition,
+                        newMousePosition,
+                        color,
+                        pencilWidth
+                    );
                     setMousePosition(newMousePosition);
-                    socket.emit("drawing", { mousePosition, newMousePosition });
+                    socket.emit("drawing", {
+                        mousePosition,
+                        newMousePosition,
+                        color,
+                        pencilWidth,
+                    });
                 }
             }
         },
@@ -100,15 +118,22 @@ export default function Canvas() {
         };
     };
 
-    const drawLine = (originalMousePosition, newMousePosition) => {
+    const drawLine = (
+        originalMousePosition,
+        newMousePosition,
+        color,
+        pencilWidth
+    ) => {
         if (!canvasRef.current) return;
+
+        console.log("stroke", pencilWidth);
 
         const canvas = canvasRef.current;
         const context = canvas.getContext("2d");
         if (context) {
-            context.strokeStyle = "hotpink";
+            context.strokeStyle = color;
             context.lineJoin = "round";
-            context.lineWidth = 10;
+            context.lineWidth = pencilWidth;
 
             context.beginPath();
             context.moveTo(
@@ -131,7 +156,10 @@ export default function Canvas() {
     if (loggedUser.id === isDrawer.id) {
         return (
             <div>
-                <h3>Please draw: {randomWord}</h3>
+                <h3 className="drawing-word">
+                    Please draw: {randomWord}
+                    <Timer seconds={40} route="/points" />
+                </h3>
                 <canvas
                     ref={canvasRef}
                     height={canvasHeight}
@@ -145,7 +173,11 @@ export default function Canvas() {
                     onTouchEnd={exitPaint}
                 />
                 <div className="tools-drawer">
-                    <Timer seconds={4500} route="/points" />
+                    <Colortools
+                        onClickColor={onClickColor}
+                        onSlide={onSlide}
+                        pencilWidth={pencilWidth}
+                    />
                 </div>
             </div>
         );

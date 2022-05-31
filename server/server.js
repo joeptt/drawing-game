@@ -28,6 +28,7 @@ server.listen(process.env.PORT || 3001, function () {
 
 let drawer = null;
 let users = [];
+let roundsPlayed = 0;
 const word = ["cat", "tree", "banana", "baby", "eye", "king"];
 
 io.on("connection", (socket) => {
@@ -47,7 +48,7 @@ io.on("connection", (socket) => {
                 return user;
             }
         });
-        console.log("users not drawn", notDrawnUsers);
+
         // set drawers "hasDrawn" property to true
         if (notDrawnUsers.length === 0) {
             for (let i = 0; i < users.length; i++) {
@@ -62,7 +63,6 @@ io.on("connection", (socket) => {
         // randomly select one of the users
         drawer =
             notDrawnUsers[Math.floor(Math.random() * notDrawnUsers.length)];
-        console.log("isDrawer", drawer);
 
         for (let i = 0; i < users.length; i++) {
             if (drawer.id === users[i].id) {
@@ -71,7 +71,7 @@ io.on("connection", (socket) => {
         }
 
         //drawer = users[Math.floor(Math.random() * users.length)];
-        console.log("users after randomly selected drawrer", users);
+
         // let everyone know who the drawer is
         io.emit("isDrawer", drawer);
     });
@@ -92,18 +92,18 @@ io.on("connection", (socket) => {
         };
         // add that user to the users array
         users.push(newUser);
-        console.log(users);
+
         // send the currently logged in users to the clients
         io.emit("users", users);
     });
 
     socket.on("getLoggedInUsers", () => {
-        console.log("users", users);
         // send the current users array to client to display once they enter the "room-page"
         socket.emit("responseLoggedUsers", users);
     });
 
     socket.on("readyClicked", () => {
+        roundsPlayed = 0;
         // Set users ready property to true
         for (let i = 0; i < users.length; i++) {
             if (users[i].id === socket.id) {
@@ -132,6 +132,12 @@ io.on("connection", (socket) => {
     });
 
     socket.on("timerDone", (route) => {
+        // check route to see if you are at "/play"
+        if (route === "/play") {
+            roundsPlayed++;
+            console.log("Rounds: ", roundsPlayed);
+        }
+
         for (let i = 0; i < users.length; i++) {
             users[i].correctGuess = false;
         }
@@ -157,6 +163,7 @@ io.on("connection", (socket) => {
             for (let i = 0; i < users.length; i++) {
                 users[i].correctGuess = false;
             }
+            console.log("everyone emiting timer is done");
             //io.emit("timerIsDone", "/points");
         }
 
