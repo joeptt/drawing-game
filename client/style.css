@@ -12,7 +12,8 @@ main,
 
 html,
 body {
-    overscroll-behavior-y: none;
+    position: fixed;
+    overflow: hidden;
 }
 
 /* LOGIN */
