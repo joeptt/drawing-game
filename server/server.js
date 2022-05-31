@@ -88,6 +88,7 @@ io.on("connection", (socket) => {
             id: socket.id,
             username: data,
             points: 0,
+            correctGuess: false,
         };
         // add that user to the users array
         users.push(newUser);
@@ -131,16 +132,34 @@ io.on("connection", (socket) => {
     });
 
     socket.on("timerDone", (route) => {
+        for (let i = 0; i < users.length; i++) {
+            users[i].correctGuess = false;
+        }
         io.emit("timerIsDone", route);
+    });
+
+    socket.on("wrongWord", (data) => {
+        io.emit("wrongGuess", data);
     });
 
     socket.on("storePoints", (data) => {
         for (let i = 0; i < users.length; i++) {
             if (users[i].id === socket.id) {
                 users[i].points = users[i].points + data;
+                users[i].correctGuess = true;
             }
         }
-        console.log("users after points", users);
+        // Check if all users have guessed correctly, if so end the timer
+        if (
+            users.map((user) => user.correctGuess).filter(Boolean).length ===
+            users.length - 1
+        ) {
+            for (let i = 0; i < users.length; i++) {
+                users[i].correctGuess = false;
+            }
+            //io.emit("timerIsDone", "/points");
+        }
+
         io.emit("usersWithPoints", users);
     });
 

@@ -12,6 +12,7 @@ export default function Canvas() {
     const [isDrawer, setIsDrawer] = useState(false);
     const [loggedUser, setLoggedUser] = useState();
     const [randomWord, setRandomWord] = useState("");
+    const [wrongGuess, setWrongGuess] = useState("");
     const canvasWidth = window.innerWidth;
     const canvasHeight = window.innerHeight;
 
@@ -43,6 +44,14 @@ export default function Canvas() {
         socket.on("timerIsDone", (route) => {
             history.push(route);
         });
+        // listen for any wrong guesses
+        socket.on("wrongGuess", (data) => {
+            setWrongGuess(data);
+            setTimeout(() => {
+                setWrongGuess("");
+            }, 1500);
+        });
+
         // clean up
         return () => {
             socket.removeListener("timerIsDone");
@@ -81,9 +90,7 @@ export default function Canvas() {
     }, []);
 
     const getCoordinates = (event) => {
-        console.log("eventtouches", event);
         if (!canvasRef.current) return;
-
         const canvas = canvasRef.current;
         const x = event.pageX || event.touches[0].clientX;
         const y = event.pageY || event.touches[0].clientY;
@@ -124,9 +131,7 @@ export default function Canvas() {
     if (loggedUser.id === isDrawer.id) {
         return (
             <div>
-                <Timer seconds={3000} route="/points" />
-                <h1>isDrawer: {`${loggedUser.username}`}</h1>
-                <p>Please draw: {randomWord}</p>
+                <h3>Please draw: {randomWord}</h3>
                 <canvas
                     ref={canvasRef}
                     height={canvasHeight}
@@ -139,19 +144,22 @@ export default function Canvas() {
                     onTouchMove={paint}
                     onTouchEnd={exitPaint}
                 />
+                <div className="tools-drawer">
+                    <Timer seconds={4500} route="/points" />
+                </div>
             </div>
         );
     } else {
         return (
-            <div>
-                <h1>{isDrawer.username} is drawing...</h1>
+            <div className="guessers-canvas-div">
+                <h1>Drawer: {isDrawer.username}</h1>
                 <canvas
                     className="guesser-canvas"
                     ref={canvasRef}
                     height={canvasHeight}
                     width={canvasWidth}
                 />
-                <Guessing randomWord={randomWord} />
+                <Guessing randomWord={randomWord} wrongGuess={wrongGuess} />
             </div>
         );
     }

@@ -23,6 +23,10 @@ export default function Room() {
             console.log("data in users ON", data);
             setUsers([...users, ...data]);
         });
+        return () => {
+            socket.removeListener("users");
+            socket.removeListener("responseLoggedUsers");
+        };
     }, []);
 
     function onClickReady() {
@@ -44,7 +48,7 @@ export default function Room() {
     return (
         <div className="div-room">
             <div className="countdown-room">
-                {showTimer && <Timer seconds={3} route="/play" />}
+                {showTimer && <Timer seconds={1} route="/play" />}
             </div>
 
             <h1 className="headline-room">Users:</h1>

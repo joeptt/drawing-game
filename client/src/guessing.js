@@ -8,7 +8,7 @@ const keyboardRows = [
     ["enter", "z", "x", "c", "v", "b", "n", "m", "backspace"],
 ];
 
-export default function Guessing({ randomWord }) {
+export default function Guessing({ randomWord, wrongGuess }) {
     const [currentMs, setCurrentMs] = useState();
     const [guessed, setGuessed] = useState(false);
     const [userInput, setUserInput] = useState("");
@@ -27,7 +27,8 @@ export default function Guessing({ randomWord }) {
             console.log("Points:", points);
             socket.emit("storePoints", points);
         } else {
-            event.target.guess.value = "";
+            setUserInput("");
+            socket.emit("wrongWord", userInput);
         }
     }
 
@@ -54,28 +55,46 @@ export default function Guessing({ randomWord }) {
 
     return (
         <>
-            <div className="keyboard">
-                {keyboardRows.map((row, i) => (
-                    <div
-                        key={i}
-                        className={`keyboard-row ${
-                            i === 1 ? "keyboard-row-2" : ""
-                        }`}
-                    >
-                        {row.map((key, i) => (
-                            <div
-                                className={`keyboard-key ${
-                                    key === "enter" ? "enter-key" : ""
-                                }`}
-                                key={i}
-                                onClick={() => handleKeyPress(key)}
-                            >
-                                {key === "backspace" ? <BackSpaceIcon /> : key}
-                            </div>
-                        ))}
+            {guessed && (
+                <div className="guessed-word-div">
+                    <h1>{randomWord}</h1>
+                </div>
+            )}
+
+            {!guessed && (
+                <div className="keyboard">
+                    <div className="input-guesser">
+                        <h3>{userInput}</h3>
+                        {wrongGuess && (
+                            <h3 className="wrong-guess">{wrongGuess}</h3>
+                        )}
                     </div>
-                ))}
-            </div>
+                    {keyboardRows.map((row, i) => (
+                        <div
+                            key={i}
+                            className={`keyboard-row ${
+                                i === 1 ? "keyboard-row-2" : ""
+                            }`}
+                        >
+                            {row.map((key, i) => (
+                                <div
+                                    className={`keyboard-key ${
+                                        key === "enter" ? "enter-key" : ""
+                                    }`}
+                                    key={i}
+                                    onClick={() => handleKeyPress(key)}
+                                >
+                                    {key === "backspace" ? (
+                                        <BackSpaceIcon />
+                                    ) : (
+                                        key
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    ))}
+                </div>
+            )}
         </>
     );
 }
