@@ -10,8 +10,9 @@ main,
     height: 100%;
 }
 
+html,
 body {
-    overscroll-behavior: contain;
+    overscroll-behavior-y: none;
 }
 
 /* LOGIN */
