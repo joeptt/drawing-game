@@ -18,16 +18,26 @@ export default function Points({ userProp }) {
 
     return (
         <div>
-            <Timer seconds={10} route="/play" />
-            <h1>Points:</h1>
-            {users &&
-                users.map((user) => {
-                    return (
-                        <p key={user.id}>
-                            {user.username} has {user.points} points!
-                        </p>
-                    );
-                })}
+            <div className="timer-points">
+                <Timer seconds={10} route="/play" />
+                <div className="bar-points">
+                    <div className="in-points"></div>
+                </div>
+            </div>
+            <div className="points-container">
+                <h3>Leaderboard:</h3>
+                {users &&
+                    users.map((user) => {
+                        return (
+                            <div className="user-points" key={user.id}>
+                                <p>
+                                    {user.username.toUpperCase()}: {user.points}{" "}
+                                    POINTS
+                                </p>
+                            </div>
+                        );
+                    })}
+            </div>
         </div>
     );
 }

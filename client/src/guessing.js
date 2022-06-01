@@ -57,16 +57,18 @@ export default function Guessing({ randomWord, wrongGuess }) {
         <>
             {guessed && (
                 <div className="guessed-word-div">
-                    <h1>{randomWord}</h1>
+                    <h1>{randomWord.toUpperCase()}</h1>
                 </div>
             )}
 
             {!guessed && (
                 <div className="keyboard">
                     <div className="input-guesser">
-                        <h3>{userInput}</h3>
+                        <h3>{userInput.toUpperCase()}</h3>
                         {wrongGuess && (
-                            <h3 className="wrong-guess">{wrongGuess}</h3>
+                            <h3 className="wrong-guess">
+                                {wrongGuess.toUpperCase()}
+                            </h3>
                         )}
                     </div>
                     {keyboardRows.map((row, i) => (

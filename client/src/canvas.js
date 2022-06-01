@@ -156,10 +156,10 @@ export default function Canvas({ color, onClickColor, pencilWidth, onSlide }) {
     if (loggedUser.id === isDrawer.id) {
         return (
             <div>
-                <h3 className="drawing-word">
-                    Please draw: {randomWord}
-                    <Timer seconds={40} route="/points" />
-                </h3>
+                <h3 className="drawing-word">Please draw: {randomWord}</h3>
+                <div className="timer-canvas">
+                    <Timer seconds={4000} route="/points" />
+                </div>
                 <canvas
                     ref={canvasRef}
                     height={canvasHeight}
@@ -173,6 +173,9 @@ export default function Canvas({ color, onClickColor, pencilWidth, onSlide }) {
                     onTouchEnd={exitPaint}
                 />
                 <div className="tools-drawer">
+                    <div className="bar-drawer">
+                        <div className="in-drawer"></div>
+                    </div>
                     <Colortools
                         onClickColor={onClickColor}
                         onSlide={onSlide}
@@ -184,13 +187,18 @@ export default function Canvas({ color, onClickColor, pencilWidth, onSlide }) {
     } else {
         return (
             <div className="guessers-canvas-div">
+                <div className="bar-guesser">
+                    <div className="in-guesser"></div>
+                </div>
                 <h1>Drawer: {isDrawer.username}</h1>
+
                 <canvas
                     className="guesser-canvas"
                     ref={canvasRef}
                     height={canvasHeight}
                     width={canvasWidth}
                 />
+
                 <Guessing randomWord={randomWord} wrongGuess={wrongGuess} />
             </div>
         );

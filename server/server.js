@@ -168,7 +168,14 @@ io.on("connection", (socket) => {
             //io.emit("timerIsDone", "/points");
         }
 
-        io.emit("usersWithPoints", users);
+        io.emit(
+            "usersWithPoints",
+            users
+                .sort((a, b) => {
+                    return a.points - b.points;
+                })
+                .reverse()
+        );
     });
 
     socket.on("disconnect", async () => {
