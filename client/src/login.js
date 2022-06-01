@@ -20,6 +20,10 @@ export default function Login() {
 
     return (
         <div className="login-div">
+            <img
+                className="img-icon"
+                src="https://i.ibb.co/dMDBy8C/DRAW-1.png"
+            />
             <form className="login-form" onSubmit={onSubmit}>
                 <input name="username" placeholder="Enter Name..."></input>
                 <button>Play</button>

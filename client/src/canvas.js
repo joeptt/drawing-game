@@ -34,7 +34,6 @@ export default function Canvas({ color, onClickColor, pencilWidth, onSlide }) {
         });
 
         socket.on("drawing", (data) => {
-            console.log(data.color);
             drawLine(
                 data.mousePosition,
                 data.newMousePosition,
@@ -125,8 +124,6 @@ export default function Canvas({ color, onClickColor, pencilWidth, onSlide }) {
         pencilWidth
     ) => {
         if (!canvasRef.current) return;
-
-        console.log("stroke", pencilWidth);
 
         const canvas = canvasRef.current;
         const context = canvas.getContext("2d");

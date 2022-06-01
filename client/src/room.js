@@ -46,23 +46,34 @@ export default function Room() {
     }
 
     return (
-        <div className="div-room">
+        <>
             <div className="countdown-room">
                 {showTimer && <Timer seconds={1} route="/play" />}
             </div>
-
-            <h1 className="headline-room">Users:</h1>
-            <div className="users-room">
-                {users &&
-                    users.map((user) => {
-                        return (
-                            <p key={user.id}>
-                                {user.username} is {user.ready || "not"} ready.
-                            </p>
-                        );
-                    })}
+            <div className="div-room">
+                <h1 className="headline-room">Users</h1>
+                <div className="users-room">
+                    {users &&
+                        users.map((user) => {
+                            return (
+                                <div
+                                    className="user-in-waiting-room"
+                                    key={user.id}
+                                >
+                                    {user.ready && (
+                                        <p>{user.username.toUpperCase()} 🟢 </p>
+                                    )}
+                                    {!user.ready && (
+                                        <p>{user.username.toUpperCase()} 🔴</p>
+                                    )}
+                                </div>
+                            );
+                        })}
+                </div>
+                <div className="button-room-div">
+                    <button onClick={onClickReady}>READY</button>
+                </div>
             </div>
-            <button onClick={onClickReady}>READY</button>
-        </div>
+        </>
     );
 }
